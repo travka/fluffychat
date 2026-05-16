@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/intro/flows/restore_backup_flow.dart';
@@ -10,7 +11,6 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -39,11 +39,7 @@ class IntroPage extends StatelessWidget {
     return LoginScaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          addMultiAccount
-              ? L10n.of(context).addAccount
-              : L10n.of(context).login,
-        ),
+        title: addMultiAccount ? Text(L10n.of(context).addAccount) : null,
         actions: [
           PopupMenuButton(
             useRootNavigator: true,
@@ -114,29 +110,50 @@ class IntroPage extends StatelessWidget {
                             child: Hero(
                               tag: 'info-logo',
                               child: Image.asset(
-                                './assets/banner_transparent.png',
-                                fit: BoxFit.fitWidth,
+                                './assets/logo/img/logo_favicon.png',
+                                width: 156,
+                                height: 156,
                               ),
+                            ),
+                          ),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Fluffy',
+                                  style: TextStyle(
+                                    color: AppConfig.primaryColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Chat',
+                                  style: TextStyle(
+                                    color: AppConfig.secondaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Secure [matrix] Communication',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Text(
+                              'Communicate encrypted over the decentralized [matrix] network in an easy and accessible way for everyone.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
                             ),
                           ),
                           const SizedBox(height: 32),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32.0,
-                            ),
-                            child: SelectableLinkify(
-                              text: welcomeText ?? L10n.of(context).appIntro,
-                              textScaleFactor: MediaQuery.textScalerOf(
-                                context,
-                              ).scale(1),
-                              textAlign: TextAlign.center,
-                              linkStyle: TextStyle(
-                                color: theme.colorScheme.secondary,
-                                decorationColor: theme.colorScheme.secondary,
-                              ),
-                              onOpen: (link) => launchUrlString(link.url),
-                            ),
-                          ),
                           const Spacer(),
                           Padding(
                             padding: const EdgeInsets.all(32.0),

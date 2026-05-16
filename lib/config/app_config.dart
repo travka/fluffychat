@@ -7,7 +7,7 @@ import 'dart:ui';
 
 abstract class AppConfig {
   // Const and final configuration values (immutable)
-  static const Color primaryColor = Color(0xFF5625BA);
+  static const Color primaryColor = Color(0xFF6666ff);
   static const Color primaryColorLight = Color(0xFFCCBDEA);
   static const Color secondaryColor = Color(0xFF41a2bc);
 

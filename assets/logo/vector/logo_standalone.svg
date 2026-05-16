@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient id="background" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00a1bc; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#521881; stop-opacity:1" />
+    </linearGradient>
+  </defs>
+    <rect width="480" height="480" x="10" y="10" rx="150" ry="150" fill="url(#background)" style="filter: drop-shadow(5px 5px 5px rgb(80 80 80 / 0.4));" />
+  <g style="fill: none; stroke-width: 40; stroke: white;">
+    <path d="M 99.512 139.509 C 102.058 120.868 121.22 102.817 139.822 100 C 212.532 88.99 287.744 88.894 360.439 100 C 419.192 108.976 408.004 218.887 400 240.345 C 357.679 353.802 284.458 265.489 200 300 C 162.353 315.383 145.702 360.562 118.352 390.661 C 115.568 393.725 113.743 399.265 109.609 399.48 C 105.475 399.694 87.779 225.434 99.512 139.509 Z"/>
+    <polyline points="119.573 120.364 249.741 200 379.554 119.582"/>
+  </g>
+</svg>
