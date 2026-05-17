@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../config/themes.dart';
+import '../../widgets/bot_command_menu.dart';
 import 'chat.dart';
 import 'input_bar.dart';
 
@@ -294,6 +295,22 @@ class ChatInputRow extends StatelessWidget {
                       alignment: Alignment.center,
                       child: _ChatAccountPicker(controller),
                     ),
+                  Container(
+                    height: height,
+                    width: 48,
+                    alignment: Alignment.center,
+                    child: BotCommandMenu(
+                      room: controller.room,
+                      onCommandSelected: (cmd) {
+                        controller.sendController.text = cmd;
+                        controller.sendController.selection =
+                            TextSelection.collapsed(
+                          offset: controller.sendController.text.length,
+                        );
+                        controller.onInputBarChanged(cmd);
+                      },
+                    ),
+                  ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2.0),

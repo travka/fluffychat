@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 import 'package:slugify/slugify.dart';
 
+import '../../models/bot_command.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/matrix.dart';
 import 'command_hints.dart';
@@ -52,6 +53,20 @@ class InputBar extends StatelessWidget {
     super.key,
   });
 
+  List<BotCommand> getBotCommands() {
+    final state = room.getState('m.room.bot.commands', '');
+    if (state == null) return [];
+    try {
+      final content = state.content;
+      if (content['commands'] is! List) return [];
+      return (content['commands'] as List)
+          .map((c) => BotCommand.fromJson(c as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   List<Map<String, String?>> getSuggestions(TextEditingValue text) {
     if (text.selection.baseOffset != text.selection.extentOffset ||
         text.selection.baseOffset < 0) {
@@ -61,14 +76,30 @@ class InputBar extends StatelessWidget {
     final ret = <Map<String, String?>>[];
     const maxResults = 30;
 
-    final commandMatch = RegExp(r'^/(\w*)$').firstMatch(searchText);
+    final commandMatch = RegExp(r'^(\w*)$').firstMatch(searchText);
     if (commandMatch != null) {
       final commandSearch = commandMatch[1]!.toLowerCase();
+      
+      // Client commands
       for (final command in room.client.commands.keys) {
         if (command.contains(commandSearch)) {
           ret.add({'type': 'command', 'name': command});
         }
-
+        if (ret.length > maxResults) return ret;
+      }
+      
+      // Bot commands
+      for (final botCmd in getBotCommands()) {
+        final cmdName = botCmd.command.toLowerCase();
+        if (cmdName.contains(commandSearch) || commandSearch.isEmpty) {
+          ret.add({
+            'type': 'bot_command',
+            'command': botCmd.command,
+            'description': botCmd.description,
+            'bot_name': botCmd.botName,
+            'bot_avatar': botCmd.botAvatar,
+          });
+        }
         if (ret.length > maxResults) return ret;
       }
     }
@@ -243,6 +274,41 @@ class InputBar extends StatelessWidget {
         ),
       );
     }
+    if (suggestion['type'] == 'bot_command') {
+      final command = suggestion['command']!;
+      final description = suggestion['description'] ?? '';
+      final botName = suggestion['bot_name'];
+      final botAvatar = suggestion['bot_avatar'];
+      return Tooltip(
+        message: description,
+        waitDuration: const Duration(days: 1),
+        child: ListTile(
+          onTap: () => onSelected(suggestion),
+          leading: botAvatar != null
+              ? Avatar(
+                  mxContent: Uri.tryParse(botAvatar),
+                  name: botName ?? 'Bot',
+                  size: size,
+                  client: client,
+                )
+              : Icon(
+                  Icons.smart_toy_outlined,
+                  size: size,
+                  color: theme.colorScheme.primary,
+                ),
+          title: Text(
+            '/$command',
+            style: const TextStyle(fontFamily: 'RobotoMono'),
+          ),
+          subtitle: Text(
+            botName != null ? '$botName: $description' : description,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall,
+          ),
+        ),
+      );
+    }
     if (suggestion['type'] == 'emoji') {
       final label = suggestion['label']!;
       return Tooltip(
@@ -331,7 +397,14 @@ class InputBar extends StatelessWidget {
     if (suggestion['type'] == 'command') {
       insertText = '${suggestion['name']!} ';
       startText = replaceText.replaceAllMapped(
-        RegExp(r'^(/\w*)$'),
+        RegExp(r'^(\w*)$'),
+        (Match m) => '/$insertText',
+      );
+    }
+    if (suggestion['type'] == 'bot_command') {
+      insertText = '${suggestion['command']!} ';
+      startText = replaceText.replaceAllMapped(
+        RegExp(r'^(\w*)$'),
         (Match m) => '/$insertText',
       );
     }
